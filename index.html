@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expert System Preeklampsia</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icon CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-50 font-sans text-slate-800 min-h-screen flex flex-col">
+
+    <!-- Header Navbar -->
+    <header class="bg-indigo-700 text-white shadow-md py-4">
+        <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center space-x-3">
+                <i class="fa-solid fa-user-doctor text-2xl text-indigo-200"></i>
+                <div>
+                    <h1 class="text-lg font-bold tracking-wide">Expert System Preeklampsia</h1>
+                    <p class="text-xs text-indigo-200">Deteksi Dini Berbasis Certainty Factor (CF Pakar & Terminator)</p>
+                </div>
+            </div>
+            <!-- Tombol Modal Referensi Pakar -->
+            <button onclick="openExpertModal()" class="bg-indigo-800/80 hover:bg-indigo-900 text-indigo-100 text-xs px-3.5 py-1.5 rounded-full border border-indigo-500/30 flex items-center gap-1.5 transition">
+                <i class="fa-solid fa-shield-halved"></i> Referensi Tabel Pakar
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-6xl mx-auto px-4 py-8 flex-grow w-full grid grid-cols-1 lg:grid-cols-12 gap-8">
+        
+        <!-- Form Penilaian Gejala Pasien (Kiri - 7 Cols) -->
+        <div class="lg:col-span-7 bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6">
+            <div class="border-b border-slate-100 pb-4 mb-6">
+                <h2 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                    <i class="fa-solid fa-clipboard-list text-indigo-600"></i> Form Penilaian Gejala Pasien
+                </h2>
+                <p class="text-xs text-slate-500 mt-1">Pilih tingkat kepastian untuk setiap gejala yang dialami pasien sesuai Nilai Terminator.</p>
+            </div>
+
+            <form id="preeclampsiaForm" onsubmit="event.preventDefault(); diagnose();" class="space-y-6">
+                
+                <!-- Nama / Identitas Pasien -->
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Nama / Identitas Pasien </label>
+                    <input type="text" id="patientName" oninput="this.value = this.value.replace(/[^a-zA-Z\s]/g, '')"
+                    
+                        class="w-full px-3.5 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition">
+                </div>
+
+                <!-- Label Gejala Klinis -->
+                <div class="space-y-4">
+                    <div class="bg-indigo-50 text-indigo-900 font-bold text-xs uppercase px-3 py-2 rounded-md tracking-wider">
+                        GEJALA KLINIS PREEKLAMPSIA
+                    </div>
+                    
+                    <div class="space-y-3">
+                        
+                        <!-- PM1 -->
+                        <div class="p-3 border border-slate-200 rounded-xl bg-slate-50/50 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                            <div>
+                                <span class="font-bold text-xs text-indigo-700">Gejala 1 (CF Pakar: 1.0)</span>
+                                <p class="text-xs text-slate-700 font-medium">Tekanan darah ≥140/90 mmHg setelah 20 minggu</p>
+                            </div>
+                            <select id="pm1" class="symptom-select text-xs px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 bg-white">
+                                <option value="0" selected>Tidak (0)</option>
+                                <option value="0.2">Tidak Yakin (0.2)</option>
+                                <option value="0.4">Kurang Yakin (0.4)</option>
+                                <option value="0.6">Cukup Yakin (0.6)</option>
+                                <option value="0.8">Yakin (0.8)</option>
+                                <option value="1.0">Sangat Yakin (1.0)</option>
+                            </select>
+                        </div>
+
+                        <!-- PM2 -->
+                        <div class="p-3 border border-slate-200 rounded-xl bg-slate-50/50 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                            <div>
+                                <span class="font-bold text-xs text-indigo-700">Gejala 2 (CF Pakar: 1.0)</span>
+                                <p class="text-xs text-slate-700 font-medium">Protein urine positif</p>
+                            </div>
+                            <select id="pm2" class="symptom-select text-xs px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 bg-white">
+                                <option value="0" selected>Tidak (0)</option>
+                                <option value="0.2">Tidak Yakin (0.2)</option>
+                                <option value="0.4">Kurang Yakin (0.4)</option>
+                                <option value="0.6">Cukup Yakin (0.6)</option>
+                                <option value="0.8">Yakin (0.8)</option>
+                                <option value="1.0">Sangat Yakin (1.0)</option>
+                            </select>
+                        </div>
+
+                        <!-- PM3 -->
+                        <div class="p-3 border border-slate-200 rounded-xl bg-slate-50/50 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                            <div>
+                                <span class="font-bold text-xs text-indigo-700">Gejala 3 (CF Pakar: 0.8)</span>
+                                <p class="text-xs text-slate-700 font-medium">Sakit kepala berat dan menetap</p>
+                            </div>
+                            <select id="pm3" class="symptom-select text-xs px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 bg-white">
+                                <option value="0" selected>Tidak (0)</option>
+                                <option value="0.2">Tidak Yakin (0.2)</option>
+                                <option value="0.4">Kurang Yakin (0.4)</option>
+                                <option value="0.6">Cukup Yakin (0.6)</option>
+                                <option value="0.8">Yakin (0.8)</option>
+                                <option value="1.0">Sangat Yakin (1.0)</option>
+                            </select>
+                        </div>
+
+                        <!-- PM4 -->
+                        <div class="p-3 border border-slate-200 rounded-xl bg-slate-50/50 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                            <div>
+                                <span class="font-bold text-xs text-indigo-700">Gejala 4 (CF Pakar: 0.8)</span>
+                                <p class="text-xs text-slate-700 font-medium">Gangguan penglihatan</p>
+                            </div>
+                            <select id="pm4" class="symptom-select text-xs px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 bg-white">
+                                <option value="0" selected>Tidak (0)</option>
+                                <option value="0.2">Tidak Yakin (0.2)</option>
+                                <option value="0.4">Kurang Yakin (0.4)</option>
+                                <option value="0.6">Cukup Yakin (0.6)</option>
+                                <option value="0.8">Yakin (0.8)</option>
+                                <option value="1.0">Sangat Yakin (1.0)</option>
+                            </select>
+                        </div>
+
+                        <!-- PM5 -->
+                        <div class="p-3 border border-slate-200 rounded-xl bg-slate-50/50 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                            <div>
+                                <span class="font-bold text-xs text-indigo-700">Gejala 5 (CF Pakar: 0.8)</span>
+                                <p class="text-xs text-slate-700 font-medium">Nyeri ulu hati atau perut kanan atas</p>
+                            </div>
+                            <select id="pm5" class="symptom-select text-xs px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 bg-white">
+                                <option value="0" selected>Tidak (0)</option>
+                                <option value="0.2">Tidak Yakin (0.2)</option>
+                                <option value="0.4">Kurang Yakin (0.4)</option>
+                                <option value="0.6">Cukup Yakin (0.6)</option>
+                                <option value="0.8">Yakin (0.8)</option>
+                                <option value="1.0">Sangat Yakin (1.0)</option>
+                            </select>
+                        </div>
+
+                        <!-- PM6 -->
+                        <div class="p-3 border border-slate-200 rounded-xl bg-slate-50/50 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                            <div>
+                                <span class="font-bold text-xs text-indigo-700">Gejala 6 (CF Pakar: 0.6)</span>
+                                <p class="text-xs text-slate-700 font-medium">Pembengkakan wajah tangan, dan kaki mendadak</p>
+                            </div>
+                            <select id="pm6" class="symptom-select text-xs px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 bg-white">
+                                <option value="0" selected>Tidak (0)</option>
+                                <option value="0.2">Tidak Yakin (0.2)</option>
+                                <option value="0.4">Kurang Yakin (0.4)</option>
+                                <option value="0.6">Cukup Yakin (0.6)</option>
+                                <option value="0.8">Yakin (0.8)</option>
+                                <option value="1.0">Sangat Yakin (1.0)</option>
+                            </select>
+                        </div>
+
+                        <!-- PM7 -->
+                        <div class="p-3 border border-slate-200 rounded-xl bg-slate-50/50 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                            <div>
+                                <span class="font-bold text-xs text-indigo-700">Gejala 7 (CF Pakar: 0.6)</span>
+                                <p class="text-xs text-slate-700 font-medium">Mual dan muntah setelah trimester pertama</p>
+                            </div>
+                            <select id="pm7" class="symptom-select text-xs px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 bg-white">
+                                <option value="0" selected>Tidak (0)</option>
+                                <option value="0.2">Tidak Yakin (0.2)</option>
+                                <option value="0.4">Kurang Yakin (0.4)</option>
+                                <option value="0.6">Cukup Yakin (0.6)</option>
+                                <option value="0.8">Yakin (0.8)</option>
+                                <option value="1.0">Sangat Yakin (1.0)</option>
+                            </select>
+                        </div>
+
+                        <!-- PM8 -->
+                        <div class="p-3 border border-slate-200 rounded-xl bg-slate-50/50 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                            <div>
+                                <span class="font-bold text-xs text-indigo-700">Gejala 8 (CF Pakar: 1.0)</span>
+                                <p class="text-xs text-slate-700 font-medium">Sesak napas</p>
+                            </div>
+                            <select id="pm8" class="symptom-select text-xs px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 bg-white">
+                                <option value="0" selected>Tidak (0)</option>
+                                <option value="0.2">Tidak Yakin (0.2)</option>
+                                <option value="0.4">Kurang Yakin (0.4)</option>
+                                <option value="0.6">Cukup Yakin (0.6)</option>
+                                <option value="0.8">Yakin (0.8)</option>
+                                <option value="1.0">Sangat Yakin (1.0)</option>
+                            </select>
+                        </div>
+
+                        <!-- PM9 -->
+                        <div class="p-3 border border-slate-200 rounded-xl bg-slate-50/50 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                            <div>
+                                <span class="font-bold text-xs text-indigo-700">Gejala 9 (CF Pakar: 1.0)</span>
+                                <p class="text-xs text-slate-700 font-medium">Penurunan jumlah urine</p>
+                            </div>
+                            <select id="pm9" class="symptom-select text-xs px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 bg-white">
+                                <option value="0" selected>Tidak (0)</option>
+                                <option value="0.2">Tidak Yakin (0.2)</option>
+                                <option value="0.4">Kurang Yakin (0.4)</option>
+                                <option value="0.6">Cukup Yakin (0.6)</option>
+                                <option value="0.8">Yakin (0.8)</option>
+                                <option value="1.0">Sangat Yakin (1.0)</option>
+                            </select>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Action Button -->
+                <div class="pt-2">
+                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-calculator"></i> Hitung
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Dashboard Hasil Analisis (Kanan - 5 Cols) Persis Gambar -->
+        <div class="lg:col-span-5 flex flex-col gap-6">
+            <div id="resultCard" class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6 flex-grow">
+                
+                <div class="border-b border-slate-100 pb-4 mb-4 flex justify-between items-center">
+                    <h2 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                        <i class="fa-solid fa-chart-simple text-indigo-600"></i> Hasil Analisis Certainty Factor
+                    </h2>
+                    <span id="cfBadge" class="text-xs px-2.5 py-1 rounded-full bg-slate-100 text-slate-500 font-medium">
+                        Belum Diuji
+                    </span>
+                </div>
+
+                <!-- State Sebelum Diagnosa -->
+                <div id="placeholderState" class="text-center py-16 text-slate-400 space-y-4">
+                    <div class="w-16 h-16 bg-slate-100 rounded-xl flex items-center justify-center mx-auto text-slate-400">
+                        <i class="fa-solid fa-laptop-medical text-3xl"></i>
+                    </div>
+                    <p class="text-xs text-slate-400 max-w-xs mx-auto leading-relaxed">
+                        Pilih tingkat kepastian gejala pada form di sebelah kiri lalu klik tombol <strong class="text-slate-600">Hitung</strong>.
+                    </p>
+                </div>
+
+                <!-- State Hasil Diagnosa (Persis Tampilan Gambar) -->
+                <div id="resultContent" class="hidden space-y-5">
+                    
+                    <p class="text-xs text-slate-500">Pasien: <span id="displayName" class="font-semibold text-slate-700">Anonim</span></p>
+
+                    <!-- Presentase & Progress Bar -->
+                    <div>
+                        <h3 id="cfPercentage" class="text-4xl font-extrabold text-indigo-700 tracking-tight">0,00%</h3>
+                        <div class="w-full bg-slate-100 h-2.5 rounded-full mt-2.5 overflow-hidden">
+                            <div id="progressBar" class="bg-indigo-600 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Banner Pesan Indikasi (Warna Kuning/Oranye/Merah Dinamis) -->
+                    <div id="statusBanner" class="p-3.5 bg-amber-50 border border-amber-200 text-amber-900 rounded-xl text-xs font-semibold leading-relaxed">
+                        Ada indikasi awal. Pantau gejala dan lakukan kontrol rutin.
+                    </div>
+
+                    <!-- Tabel Langkah Perhitungan Persis Gambar -->
+                    <div>
+                        <h4 class="text-xs font-bold text-slate-800 mb-2.5">Langkah perhitungan</h4>
+                        <div class="overflow-x-auto border border-slate-200 rounded-lg">
+                            <table class="w-full text-xs text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-slate-50 text-slate-600 border-b border-slate-200 font-semibold">
+                                        <th class="py-2 px-3">Kode</th>
+                                        <th class="py-2 px-3">CF pakar × CF user</th>
+                                        <th class="py-2 px-3">CF(H,E)</th>
+                                        <th class="py-2 px-3">CF combine</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="calculationTableBody" class="divide-y divide-slate-200 text-slate-700">
+                                    <!-- Baris Tabel Diisi oleh JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <p class="text-[10px] text-slate-400 mt-2 leading-normal">
+                            CF(H,E) = CF pakar × CF user. Combine: CF lama + CF(H,E) × (1 - CF lama). Alat bantu belajar, bukan pengganti pemeriksaan tenaga kesehatan.
+                        </p>
+                    </div>
+
+                    <!-- Print Button -->
+                    <button onclick="window.print()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-2.5 rounded-xl text-xs transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-print"></i> Cetak Hasil Diagnosis
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Modal Pop-Up Referensi Tabel Pakar -->
+    <div id="expertModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 space-y-6">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                    <i class="fa-solid fa-book-medical text-indigo-600"></i> Referensi Data & Tabel Pakar
+                </h3>
+                <button onclick="closeExpertModal()" class="text-slate-400 hover:text-slate-600 text-lg">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Identitas Pakar -->
+            <div class="bg-indigo-50 p-4 rounded-xl border border-indigo-100 text-xs space-y-1">
+                <p><strong>Nama Pakar:</strong> Prima Ayu Lestari, Amd. Keb.</p>
+                <p><strong>Profesi/Pekerjaan:</strong> Bidan (asisten dokter)</p>
+                <p><strong>Lama Bekerja:</strong> 2019-2026 (+_ 6 tahun)</p>
+            </div>
+
+            <!-- Tabel Kepastian / Nilai Terminator -->
+            <div>
+                <h4 class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">1. TABEL KEPASTIAN (NILAI TERMINATOR)</h4>
+                <table class="w-full text-xs text-left border border-slate-200 rounded-lg overflow-hidden">
+                    <thead class="bg-slate-100 text-slate-700">
+                        <tr>
+                            <th class="py-2 px-3 border-b">No</th>
+                            <th class="py-2 px-3 border-b">Keterangan</th>
+                            <th class="py-2 px-3 border-b">Nilai Terminator</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        <tr><td class="py-1.5 px-3">1</td><td class="py-1.5 px-3">Sangat Yakin</td><td class="py-1.5 px-3 font-semibold">1.0</td></tr>
+                        <tr><td class="py-1.5 px-3">2</td><td class="py-1.5 px-3">Yakin</td><td class="py-1.5 px-3 font-semibold">0.8</td></tr>
+                        <tr><td class="py-1.5 px-3">3</td><td class="py-1.5 px-3">Cukup Yakin</td><td class="py-1.5 px-3 font-semibold">0.6</td></tr>
+                        <tr><td class="py-1.5 px-3">4</td><td class="py-1.5 px-3">Kurang Yakin</td><td class="py-1.5 px-3 font-semibold">0.4</td></tr>
+                        <tr><td class="py-1.5 px-3">5</td><td class="py-1.5 px-3">Tidak Yakin</td><td class="py-1.5 px-3 font-semibold">0.2</td></tr>
+                        <tr><td class="py-1.5 px-3">6</td><td class="py-1.5 px-3">Tidak</td><td class="py-1.5 px-3 font-semibold">0</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Tabel CF Pakar -->
+            <div>
+                <h4 class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">2. TABEL GEJALA & CF PAKAR</h4>
+                <table class="w-full text-xs text-left border border-slate-200 rounded-lg overflow-hidden">
+                    <thead class="bg-slate-100 text-slate-700">
+                        <tr>
+                            <th class="py-2 px-3 border-b">Kode</th>
+                            <th class="py-2 px-3 border-b">Gejala-Gejala</th>
+                            <th class="py-2 px-3 border-b">Nilai CF</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        <tr><td class="py-1.5 px-3 font-bold text-indigo-700">PM1</td><td class="py-1.5 px-3">Tekanan darah ≥140/90 mmHg setelah 20 minggu</td><td class="py-1.5 px-3 font-semibold">1.0</td></tr>
+                        <tr><td class="py-1.5 px-3 font-bold text-indigo-700">PM2</td><td class="py-1.5 px-3">Protein urine positif</td><td class="py-1.5 px-3 font-semibold">1.0</td></tr>
+                        <tr><td class="py-1.5 px-3 font-bold text-indigo-700">PM3</td><td class="py-1.5 px-3">Sakit kepala berat dan menetap</td><td class="py-1.5 px-3 font-semibold">0.8</td></tr>
+                        <tr><td class="py-1.5 px-3 font-bold text-indigo-700">PM4</td><td class="py-1.5 px-3">Gangguan penglihatan</td><td class="py-1.5 px-3 font-semibold">0.8</td></tr>
+                        <tr><td class="py-1.5 px-3 font-bold text-indigo-700">PM5</td><td class="py-1.5 px-3">Nyeri ulu hati atau perut kanan atas</td><td class="py-1.5 px-3 font-semibold">0.8</td></tr>
+                        <tr><td class="py-1.5 px-3 font-bold text-indigo-700">PM6</td><td class="py-1.5 px-3">Pembengkakan wajah tangan, dan kaki mendadak</td><td class="py-1.5 px-3 font-semibold">0.6</td></tr>
+                        <tr><td class="py-1.5 px-3 font-bold text-indigo-700">PM7</td><td class="py-1.5 px-3">Mual dan muntah setelah trimester pertama</td><td class="py-1.5 px-3 font-semibold">0.6</td></tr>
+                        <tr><td class="py-1.5 px-3 font-bold text-indigo-700">PM8</td><td class="py-1.5 px-3">Sesak napas</td><td class="py-1.5 px-3 font-semibold">1.0 (tanda bahaya)</td></tr>
+                        <tr><td class="py-1.5 px-3 font-bold text-indigo-700">PM9</td><td class="py-1.5 px-3">Penurunan jumlah urine</td><td class="py-1.5 px-3 font-semibold">1.0 (evaluasi ginjal)</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="text-right">
+                <button onclick="closeExpertModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-4 py-2 rounded-lg font-semibold">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500">
+        <p>&copy; 2026 Sistem Pakar Deteksi Preeklampsia - Certainty Factor Engine.</p>
+    </footer>
+
+    <!-- Logic Script Persis Gambar -->
+    <script>
+    // 1. PASTE URL GOOGLE APPS SCRIPT ANDA DI ANTARA TANDA PETIK DI BAWAH INI:
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx8lvXUSG_vqxnR9XoUv5pIL5xs21wOEb-S1pRIjqJVrqHpd4vCnlw-wzTlAN3ctCVR/exec";
+
+    const expertData = [
+        { code: "PM1", cfPakar: 1.0 },
+        { code: "PM2", cfPakar: 1.0 },
+        { code: "PM3", cfPakar: 0.8 },
+        { code: "PM4", cfPakar: 0.8 },
+        { code: "PM5", cfPakar: 0.8 },
+        { code: "PM6", cfPakar: 0.6 },
+        { code: "PM7", cfPakar: 0.6 },
+        { code: "PM8", cfPakar: 1.0 },
+        { code: "PM9", cfPakar: 1.0 }
+    ];
+
+    function formatDecimal(num) {
+        return num.toString().replace('.', ',');
+    }
+
+    function diagnose() {
+        const patientName = document.getElementById('patientName').value || 'Anonim';
+        document.getElementById('displayName').innerText = patientName;
+
+        let tableHTML = "";
+        let currentCFCombine = 0;
+        let selectedSymptomsList = [];
+
+        for (let i = 0; i < expertData.length; i++) {
+            const userVal = parseFloat(document.getElementById(`pm${i+1}`).value) || 0;
+            const cfHE = expertData[i].cfPakar * userVal;
+            
+            // Catat gejala yang dipilih user
+            if (userVal > 0) {
+                selectedSymptomsList.push(`${expertData[i].code} (${userVal})`);
+            }
+
+            if (i === 0) {
+                currentCFCombine = cfHE;
+            } else {
+                currentCFCombine = currentCFCombine + (cfHE * (1 - currentCFCombine));
+            }
+
+            const multiplyStr = `${formatDecimal(expertData[i].cfPakar)} × ${formatDecimal(userVal)}`;
+            const cfHEStr = formatDecimal(Math.round(cfHE * 10000) / 10000);
+            const cfCombineStr = formatDecimal(Math.round(currentCFCombine * 10000) / 10000);
+
+            tableHTML += `
+                <tr>
+                    <td class="py-2 px-3 font-medium text-slate-800">${expertData[i].code}</td>
+                    <td class="py-2 px-3 text-slate-600">${multiplyStr}</td>
+                    <td class="py-2 px-3 text-slate-600">${cfHEStr}</td>
+                    <td class="py-2 px-3 font-semibold text-slate-800">${cfCombineStr}</td>
+                </tr>
+            `;
+        }
+
+        const percentageVal = currentCFCombine * 100;
+        const formattedPercentage = formatDecimal((Math.round(percentageVal * 100) / 100).toFixed(2)) + "%";
+
+       const statusBanner = document.getElementById('statusBanner');
+        let classPrediksi = "";
+        let statusText = "";
+        let rekomendasiPakarHTML = "";
+
+        // Logika Pengkategorian Nilai CF % dan Rekomendasi Pakar
+        if (percentageVal === 0) {
+            classPrediksi = "Tidak";
+            statusText = "✅ HASIL DIAGNOSIS: TIDAK (Kondisi Normal)";
+            statusBanner.className = "p-4 bg-emerald-50 border border-emerald-200 text-emerald-900 rounded-xl text-xs leading-relaxed space-y-2";
+            rekomendasiPakarHTML = `
+                <p class="font-bold text-emerald-950 mb-1">💡 Rekomendasi Pakar (Kondisi Normal):</p>
+                <ul class="list-disc list-inside space-y-1 text-emerald-800">
+                    <li>Tidak ditemukan gejala preeklampsia. Kondisi kesehatan ibu dan janin tergolong stabil.</li>
+                    <li>Tetap lakukan pemeriksaan kehamilan (ANC) secara berkala sesuai jadwal bidan/dokter.</li>
+                    <li>Pertahankan gaya hidup sehat, minum air putih yang cukup, dan konsumsi nutrisi seimbang.</li>
+                </ul>
+            `;
+        } 
+        else if (percentageVal <= 30.0) {
+            classPrediksi = "Tidak";
+            statusText = "✅ HASIL DIAGNOSIS: TIDAK (Risiko Sangat Rendah)";
+            statusBanner.className = "p-4 bg-teal-50 border border-teal-200 text-teal-900 rounded-xl text-xs leading-relaxed space-y-2";
+            rekomendasiPakarHTML = `
+                <p class="font-bold text-teal-950 mb-1">💡 Rekomendasi Pakar (Risiko Sangat Rendah):</p>
+                <ul class="list-disc list-inside space-y-1 text-teal-800">
+                    <li>Gejala yang dirasakan tergolong sangat ringan dan belum mengarah ke preeklampsia.</li>
+                    <li>Perbanyak istirahat fisik dan hindari aktivitas berlebih yang memicu kelelahan.</li>
+                    <li>Catat jika ada keluhan baru dan konsultasikan pada kunjungan ANC berikutnya.</li>
+                </ul>
+            `;
+        } 
+        else if (percentageVal <= 50.0) {
+            classPrediksi = "Tidak";
+            statusText = "✅ HASIL DIAGNOSIS: TIDAK (Indikasi Awal / Waspada)";
+            statusBanner.className = "p-4 bg-amber-50 border border-amber-200 text-amber-900 rounded-xl text-xs leading-relaxed space-y-2";
+            rekomendasiPakarHTML = `
+                <p class="font-bold text-amber-950 mb-1">💡 Rekomendasi Pakar (Perlu Pemantauan):</p>
+                <ul class="list-disc list-inside space-y-1 text-amber-800">
+                    <li>Meskipun dikategorikan TIDAK preeklampsia, terdapat beberapa gejala awal yang perlu diwaspadai.</li>
+                    <li>Lakukan pengukuran tekanan darah secara berkala (minimal 2-3 hari sekali).</li>
+                    <li>Kurangi konsumsi makanan tinggi garam/natrium dan perbanyak asupan protein.</li>
+                    <li>Jadwalkan konsultasi ke bidan/dokter lebih awal jika keluhan menetap.</li>
+                </ul>
+            `;
+        } 
+        else if (percentageVal <= 75.0) {
+            classPrediksi = "Ya";
+            statusText = "⚠️ HASIL DIAGNOSIS: YA (Terdeteksi Preeklampsia Sedang)";
+            statusBanner.className = "p-4 bg-orange-50 border border-orange-200 text-orange-900 rounded-xl text-xs leading-relaxed space-y-2";
+            rekomendasiPakarHTML = `
+                <p class="font-bold text-orange-950 mb-1">💡 Rekomendasi Pakar (Preeklampsia Ringan/Sedang):</p>
+                <ul class="list-disc list-inside space-y-1 text-orange-800">
+                    <li><strong>Konsultasi Medis:</strong> Segera jadwalkan pemeriksaan intensif ke Dokter Spesialis Kandungan (Sp.OG).</li>
+                    <li><strong>Pemeriksaan Laboratorium:</strong> Disarankan melakukan tes protein urine dan cek laboratorium darah rutin.</li>
+                    <li><strong>Istirahat Total (Bedrest):</strong> Tirah baring (tidur miring ke kiri) untuk membantu memperlancar aliran darah ke janin.</li>
+                    <li><strong>Pantau Tekanan Darah:</strong> Ukur dan catat tekanan darah setiap hari.</li>
+                </ul>
+            `;
+        } 
+        else {
+            classPrediksi = "Ya";
+            statusText = "🚨 HASIL DIAGNOSIS: YA (Indikasi Kuat Preeklampsia Berat)";
+            statusBanner.className = "p-4 bg-rose-50 border border-rose-200 text-rose-900 rounded-xl text-xs leading-relaxed space-y-2";
+            rekomendasiPakarHTML = `
+                <p class="font-bold text-rose-950 mb-1">🚨 Rekomendasi Pakar (Kondisi Darurat Medis):</p>
+                <ul class="list-disc list-inside space-y-1 text-rose-800">
+                    <li><strong>Penanganan Segera:</strong> Segera menuju ke Rumah Sakit / UGD / Puskesmas terdekat!</li>
+                    <li><strong>Waspadai Gejala Bahaya:</strong> Jika mengalami pusing hebat, pandangan kabur/ganda, nyeri ulu hati parah, atau kejang, minta bantuan darurat segera.</li>
+                    <li><strong>Dampingi Pasien:</strong> Pastikan pasien tidak melakukan aktivitas fisik dan ditemani keluarga menuju fasilitas kesehatan.</li>
+                </ul>
+            `;
+        }
+
+        // Tampilkan ke Banner HTML
+        const badgeColor = classPrediksi === "Ya" ? "bg-rose-600" : "bg-emerald-600";
+        const badgeLabel = classPrediksi === "Ya" ? "POSITIF" : "NEGATIF";
+
+        statusBanner.innerHTML = `
+            <div class="flex items-center justify-between font-semibold">
+                <span>${statusText}</span>
+                <span class="${badgeColor} text-white text-[10px] px-2 py-0.5 rounded font-bold">${badgeLabel}</span>
+            </div>
+            <hr class="opacity-30 my-1">
+            <div>
+                ${rekomendasiPakarHTML}
+            </div>
+        `;
+        document.getElementById('placeholderState').classList.add('hidden');
+        document.getElementById('resultContent').classList.remove('hidden');
+
+        document.getElementById('cfPercentage').innerText = formattedPercentage;
+        document.getElementById('progressBar').style.width = `${Math.min(percentageVal, 100)}%`;
+        document.getElementById('cfBadge').innerText = "Selesai";
+        document.getElementById('cfBadge').className = "text-xs px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-700 font-semibold";
+        
+        document.getElementById('calculationTableBody').innerHTML = tableHTML;
+
+        // --- BAGIAN INI YANG TERHUBUNG KE GOOGLE SHEETS ---
+        if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL !== "") {
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    nama: patientName,
+                    cfPercentage: formattedPercentage,
+                    classPrediksi: classPrediksi,
+                    statusText: statusText,
+                    selectedSymptoms: selectedSymptomsList.join(', ') || 'Semua Tidak (0)'
+                })
+            })
+            .then(() => console.log("Data berhasil dikirim ke Google Sheets!"))
+            .catch(err => console.error("Gagal mengirim data:", err));
+        }
+    }
+
+    function printFullReport() {
+        document.getElementById('expertModal').classList.remove('hidden');
+        setTimeout(() => {
+            window.print();
+        }, 300);
+    }
+
+    function openExpertModal() {
+        document.getElementById('expertModal').classList.remove('hidden');
+    }
+    function closeExpertModal() {
+        document.getElementById('expertModal').classList.add('hidden');
+    }
+</script>
+</body>
+</html>
